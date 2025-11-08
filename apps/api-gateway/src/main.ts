@@ -1,0 +1,23 @@
+import { NestFactory } from "@nestjs/core";
+import { ApiGatewayModule } from "./api-gateway.module";
+import helmet from "helmet";
+import cookieParser from "cookie-parser";
+import { RpcExceptionFilter } from "../../common/filters/global.exception";
+
+async function bootstrap() {
+  const app = await NestFactory.create(ApiGatewayModule);
+
+  //cors configuration
+  app.enableCors({
+    origin: ["https://localhost:5432/"],
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true,
+    allowedHeaders: "Content-Type, Authorization",
+  });
+  app.use(cookieParser());
+  //Helmet helps protect the app from common web vulnerabilities by setting various HTTP security headers automatically.
+  app.use(helmet());
+  app.useGlobalFilters(new RpcExceptionFilter());
+  await app.listen(process.env.port ?? 3000);
+}
+bootstrap();
