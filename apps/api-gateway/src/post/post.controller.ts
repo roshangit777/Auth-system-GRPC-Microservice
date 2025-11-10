@@ -57,8 +57,6 @@ export class PostController {
     if (!postData.title || !postData.content) {
       throw new RpcException({ status: 400, message: "Id should be valid" });
     }
-    console.log("id==========>", id);
-    console.log("postdata==========>", id);
     return this.postClient.send("post.update", { id, postData });
   }
 

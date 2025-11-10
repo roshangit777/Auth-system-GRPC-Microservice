@@ -1,12 +1,7 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { Request } from 'express';
+import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
+import { RpcException } from "@nestjs/microservices";
+import { Request } from "express";
 
 interface Payload {
   sub: number;
@@ -32,25 +27,28 @@ export class AuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest<AuthRequest>();
     const token = this.extractTokenFromHeader(request);
     if (!token) {
-      throw new UnauthorizedException('Token missing');
+      throw new RpcException({ status: 401, message: "Token missing" });
     }
 
     try {
-      const secret = 'jwtsecret';
-      if (!secret) throw new Error('JWT_SECRET not defined');
+      const secret = "jwtsecret";
+      if (!secret) throw new Error("JWT_SECRET not defined");
 
       const payload: Payload = await this.jwtService.verifyAsync(token, {
         secret,
       });
 
       if (!payload) {
-        throw new NotFoundException('Invalid Token');
+        throw new RpcException({ status: 401, message: "Invalid Token" });
       }
       // assign payload safely
       request.user = payload;
     } catch (error) {
       if (error) {
-        throw new UnauthorizedException('Invalid or expired token');
+        throw new RpcException({
+          status: 401,
+          message: "Invalid Token or Expired Token",
+        });
       }
     }
 
@@ -62,7 +60,7 @@ export class AuthGuard implements CanActivate {
     // so `request.cookies` will be available
     const authHeader = request.headers.authorization;
     if (!authHeader) return undefined;
-    const [type, token] = authHeader.split(' ');
-    return type === 'Bearer' ? token : undefined;
+    const [type, token] = authHeader.split(" ");
+    return type === "Bearer" ? token : undefined;
   }
 }

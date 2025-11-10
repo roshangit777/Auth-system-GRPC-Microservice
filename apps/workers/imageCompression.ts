@@ -33,5 +33,11 @@ compressImage().catch((err) => {
   if (!parentPort) {
     throw new Error("Error in parentPort");
   }
-  parentPort.postMessage({ success: false, error: err.message });
+  parentPort.postMessage({
+    success: false,
+    error: {
+      message: err.message,
+      code: "IMAGE_COMPRESSION_FAILED",
+    },
+  });
 });

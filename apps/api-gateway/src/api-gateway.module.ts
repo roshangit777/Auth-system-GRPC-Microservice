@@ -5,6 +5,7 @@ import { AuthModule } from "./auth/auth.module";
 import { PostModule } from "./post/post.module";
 import { FileUploadModule } from "./file-upload/file-upload.module";
 import { JwtModule } from "@nestjs/jwt";
+import { LoginHistoryModule } from './login-history/login-history.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { JwtModule } from "@nestjs/jwt";
     JwtModule.register({
       global: true,
     }),
+    LoginHistoryModule,
   ],
   controllers: [ApiGatewayController],
   providers: [ApiGatewayService],

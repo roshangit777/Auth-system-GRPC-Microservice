@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  Inject,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -11,14 +12,16 @@ import { RegisterUserDto } from "./dto/register.dto";
 import * as bcrypt from "bcrypt";
 import { LoginUserDto } from "./dto/login.dto";
 import { JwtService } from "@nestjs/jwt";
+import { ClientProxy, RpcException } from "@nestjs/microservices";
 /* import { LoginHistory } from 'src/events/entity/login-history.entity'; */
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(Users) private userRepository: Repository<Users>,
-    private jwtService: JwtService
+    private jwtService: JwtService,
     /* private readonly userEventService: UserEventsService, */
+    @Inject("LOGIN_HISTORY_CLIENT") private loginHistroryClient: ClientProxy
   ) {}
 
   async userRegister(userData: RegisterUserDto) {
@@ -26,7 +29,10 @@ export class AuthService {
       where: { email: userData.email },
     });
     if (existUser) {
-      throw new ConflictException("Email alredy exist use a different email");
+      throw new ConflictException({
+        status: 409,
+        message: "Email alredy exist use a different email",
+      });
     }
     const user = this.userRepository.create({
       ...userData,
@@ -49,7 +55,10 @@ export class AuthService {
       where: { email: userData.email },
     });
     if (existUser) {
-      throw new ConflictException("Email alredy exist use a different email");
+      throw new ConflictException({
+        status: 409,
+        message: "Email alredy exist use a different email",
+      });
     }
     const admin = this.userRepository.create({
       ...userData,
@@ -73,7 +82,10 @@ export class AuthService {
       !user ||
       !(await this.comparePasswords(userData.password, user.password))
     ) {
-      throw new UnauthorizedException("Email or password is invalid");
+      throw new RpcException({
+        status: 401,
+        message: "Email or password is invalid",
+      });
     }
     const payload = { sub: user.id, email: user.email, role: user.role };
     /*  await this.userEventService.recordLogin(user.id); */
@@ -86,6 +98,19 @@ export class AuthService {
         expiresIn: "1d",
       }
     );
+
+    //save for login history
+    const loginData = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    };
+    this.loginHistroryClient.emit("history.create", loginData);
+    /* this.loginHistroryClient.emit("history.create", user.id).subscribe({
+      next: (res) => console.log("Login recorded:", res),
+      error: (err) => console.error("Error recording login:", err),
+    }); */
     return { access_token, refresh_token };
   }
 
@@ -97,7 +122,10 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new NotFoundException("User not found for Token Refresh");
+      throw new RpcException({
+        status: 404,
+        message: "User not found for Token Refresh",
+      });
     }
     const payload = { sub: user.id, email: user.email, role: user?.role };
     const access_token = await this.jwtService.signAsync(payload, {
@@ -115,11 +143,17 @@ export class AuthService {
       !user ||
       !(await this.comparePasswords(userData.password, user.password))
     ) {
-      throw new UnauthorizedException("Email or password is invalid");
+      throw new RpcException({
+        status: 400,
+        message: "Email or password is invalid",
+      });
     }
     if (user.role !== UserRole.ADMIN) {
       {
-        throw new UnauthorizedException("Insufficient permission");
+        throw new RpcException({
+          status: 401,
+          message: "Insufficient permission",
+        });
       }
     }
 
@@ -135,25 +169,16 @@ export class AuthService {
       { id: user.id },
       { expiresIn: "7d" }
     );
+    //save for login history
+    const loginData = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    };
+    this.loginHistroryClient.emit("history.create", loginData);
     return { access_token, refresh_token };
   }
-
-  /*  async getUserLoginHistory(userId: number | undefined): Promise<any[]> {
-    if (!userId) {
-      return await this.loginUserHistoryRepository.find({
-        relations: ["user"],
-      });
-    } else {
-      const history = await this.loginUserHistoryRepository.find({
-        where: { user: { id: userId } },
-        select: ["loginTime"],
-      });
-      if (!history) {
-        throw new NotFoundException(`Login record of the ${userId} not found`);
-      }
-      return history.map((item) => item.loginTime);
-    }
-  } */
 
   private async hashPassword(password: string): Promise<string> {
     return await bcrypt.hash(password, 10); // hashes the plain password

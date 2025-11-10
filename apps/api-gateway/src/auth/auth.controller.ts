@@ -4,7 +4,6 @@ import {
   Get,
   Inject,
   Post,
-  Query,
   Req,
   Res,
   UseGuards,

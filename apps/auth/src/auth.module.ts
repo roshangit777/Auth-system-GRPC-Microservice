@@ -6,11 +6,19 @@ import { Users } from "./entities/user.entity";
 import { JwtModule } from "@nestjs/jwt";
 /* import { EventsModule } from "src/events/events.module"; */
 import { AppModule } from "./app.module";
+import { ClientsModule, Transport } from "@nestjs/microservices";
 
 @Module({
   imports: [
     AppModule,
     TypeOrmModule.forFeature([Users]),
+    ClientsModule.register([
+      {
+        name: "LOGIN_HISTORY_CLIENT",
+        transport: Transport.TCP,
+        options: { port: 3004 },
+      },
+    ]),
     JwtModule.register({
       global: true,
       secret: "jwtsecret",

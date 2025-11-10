@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { ThrottlerException, ThrottlerGuard } from '@nestjs/throttler';
+import { Injectable } from "@nestjs/common";
+import { RpcException } from "@nestjs/microservices";
+import { ThrottlerException, ThrottlerGuard } from "@nestjs/throttler";
 
 @Injectable()
 export class LoginThrottlerGuard extends ThrottlerGuard {
   protected async getTracker(req: Record<string, any>): Promise<string> {
-    const email = ((await req.body?.email) as string) || 'anonymous';
+    const email = ((await req.body?.email) as string) || "anonymous";
     return `login-${email}`;
   }
   // set limit to 5 attempts
@@ -17,8 +18,9 @@ export class LoginThrottlerGuard extends ThrottlerGuard {
   }
 
   protected throwThrottlingException(): Promise<void> {
-    throw new ThrottlerException(
-      'Too many attempts. Please try again after 1 minute',
-    );
+    throw new RpcException({
+      status: 429,
+      message: "Too many attempts. Please try again after 1 minute",
+    });
   }
 }

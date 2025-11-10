@@ -1,8 +1,6 @@
 import { Controller } from "@nestjs/common";
 import { FileUploadService } from "./file-upload.service";
 import { MessagePattern, Payload } from "@nestjs/microservices";
-import { InjectRepository } from "@nestjs/typeorm";
-import { File } from "./entity/cloudinary.entity";
 
 interface AuthorData {
   sub: number;

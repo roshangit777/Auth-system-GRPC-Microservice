@@ -1,17 +1,17 @@
 import { Module } from "@nestjs/common";
-import { AuthController } from "./auth.controller";
+import { LoginHistoryController } from "./login-history.controller";
 import { ClientsModule, Transport } from "@nestjs/microservices";
 
 @Module({
   imports: [
     ClientsModule.register([
       {
-        name: "AUTH_CLIENT",
+        name: "LOGIN_HISTORY_CLIENT",
         transport: Transport.TCP,
-        options: { port: 3001 },
+        options: { port: 3004 },
       },
     ]),
   ],
-  controllers: [AuthController],
+  controllers: [LoginHistoryController],
 })
-export class AuthModule {}
+export class LoginHistoryModule {}

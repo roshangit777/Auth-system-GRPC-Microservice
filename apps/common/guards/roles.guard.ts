@@ -6,6 +6,7 @@ import {
 } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { ROLES_KEY } from "../decorators/roles.decorator";
+import { RpcException } from "@nestjs/microservices";
 
 export enum UserRole {
   USER = "user",
@@ -44,12 +45,18 @@ export class RolesGuard implements CanActivate {
     }
     const { user } = context.switchToHttp().getRequest<AuthenticatedRequest>();
     if (!user) {
-      throw new ForbiddenException("User not authenticated");
+      throw new RpcException({
+        status: 403,
+        message: "User not authenticated",
+      });
     }
     const hasRequiredRole = requiredRoles.some((role) => role === user.role);
     console.log(requiredRoles);
     if (!hasRequiredRole) {
-      throw new ForbiddenException("Insufficient permission");
+      throw new RpcException({
+        status: 403,
+        message: "Insufficient permission",
+      });
     }
     return true;
   }

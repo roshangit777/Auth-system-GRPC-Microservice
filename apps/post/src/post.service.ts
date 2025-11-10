@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { Post } from "./post.interfaces";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
@@ -105,7 +105,10 @@ export class PostService {
       /* relations: ["author"], */
     });
     if (!post) {
-      throw new NotFoundException(`Post with ID ${id} not found`);
+      throw new RpcException({
+        status: 404,
+        message: `Post with ID ${id} not found`,
+      });
     }
     return post;
   }
@@ -161,7 +164,7 @@ export class PostService {
   async deletePost(id: number) {
     const post = await this.usePostsRepository.findOne({ where: { id: id } });
     if (!post) {
-      throw new NotFoundException("Post doesn't exist");
+      throw new RpcException({ status: 404, message: "Post doesn't exist" });
     }
     await this.usePostsRepository.delete({ id });
     return { message: "Post deleted successfully", post };
