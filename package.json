@@ -6,7 +6,11 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build",
+    "build:api-gateway": "nest build api-gateway",
+    "build:auth": "nest build auth",
+    "build:post": "nest build post",
+    "build:file-upload": "tsc -p apps/workers/tsconfig.app.json && nest build file-upload",
+    "build:login-history": "nest build login-history",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",

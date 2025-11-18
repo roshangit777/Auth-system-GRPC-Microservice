@@ -8,7 +8,7 @@ import { LoginHistory } from "./entity/login-history.entity";
   imports: [
     TypeOrmModule.forRoot({
       type: "postgres",
-      host: "localhost",
+      host: "host.docker.internal",
       port: 5432,
       username: "postgres", // your pgAdmin username
       password: "root", // your pgAdmin password

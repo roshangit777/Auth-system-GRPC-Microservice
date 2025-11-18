@@ -12,7 +12,7 @@ import { Posts } from "./entity/post.entity";
   imports: [
     TypeOrmModule.forRoot({
       type: "postgres",
-      host: "localhost",
+      host: "host.docker.internal",
       port: 5432,
       username: "postgres",
       password: "root",

@@ -8,6 +8,7 @@ import {
 import { Observable, throwError } from "rxjs";
 import { catchError } from "rxjs/operators";
 import { status } from "@grpc/grpc-js";
+import { RpcException } from "@nestjs/microservices";
 
 @Injectable()
 export class GrpcToHttpInterceptor implements NestInterceptor {
@@ -21,7 +22,26 @@ export class GrpcToHttpInterceptor implements NestInterceptor {
   }
 
   private mapGrpcErrorToHttp(err: any): HttpException {
-    const grpcCode = err.code;
+    // Extract actual gRPC error object
+    const errorObj =
+      err instanceof RpcException
+        ? err.getError()
+        : err.error
+          ? err.error
+          : err.cause
+            ? err.cause
+            : err;
+
+    const grpcCode = errorObj?.code ?? status.INTERNAL;
+
+    // CLEAN MESSAGE (remove "3 INVALID_ARGUMENT:" etc.)
+    let grpcMessage = errorObj?.message ?? "gRPC error occurred";
+
+    if (typeof grpcMessage === "string") {
+      const parts = grpcMessage.split(":");
+      grpcMessage =
+        parts.length > 1 ? parts.slice(1).join(":").trim() : grpcMessage;
+    }
 
     const map = {
       [status.NOT_FOUND]: 404,
@@ -40,7 +60,7 @@ export class GrpcToHttpInterceptor implements NestInterceptor {
     return new HttpException(
       {
         statusCode: httpStatus,
-        message: err.details || "gRPC error",
+        message: grpcMessage, // cleaned message only
       },
       httpStatus
     );

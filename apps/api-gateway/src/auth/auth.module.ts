@@ -2,9 +2,11 @@ import { Module } from "@nestjs/common";
 import { AuthController } from "./auth.controller";
 import { ClientsModule, Transport } from "@nestjs/microservices";
 import { join } from "path";
+import { ConfigModule } from "@nestjs/config";
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
     ClientsModule.register([
       {
         name: "AUTH_CLIENT",
@@ -12,7 +14,9 @@ import { join } from "path";
         options: {
           package: "auth",
           protoPath: join(process.cwd(), "proto/auth.proto"),
-          url: "0.0.0.0:50052",
+          url:
+            `${process.env.AUTH_HOST}:${process.env.AUTH_PORT}` ||
+            "0.0.0.0:50052",
         },
       },
     ]),

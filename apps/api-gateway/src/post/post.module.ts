@@ -12,7 +12,9 @@ import { join } from "path";
         options: {
           package: "post",
           protoPath: join(process.cwd(), "proto/post.proto"),
-          url: "0.0.0.0:50051",
+          url:
+            `${process.env.POST_HOST}:${process.env.POST_PORT}` ||
+            "0.0.0.0:50051",
         },
       },
     ]),

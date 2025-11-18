@@ -1,0 +1,18 @@
+FROM node:20
+
+WORKDIR /app
+
+# copy package files
+COPY package*.json ./
+
+# install all deps
+RUN npm install
+
+# copy full project
+COPY . .
+
+# build the entire monorepo
+RUN npm run build:file-upload
+
+# run ONLY api-gateway
+CMD ["node", "dist/apps/file-upload/main.js"]

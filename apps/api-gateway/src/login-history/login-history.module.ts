@@ -12,7 +12,9 @@ import { join } from "path";
         options: {
           package: "history",
           protoPath: join(process.cwd(), "proto/history.proto"),
-          url: "0.0.0.0:50054",
+          url:
+            `${process.env.HISTORY_HOST}:${process.env.HISTORY_PORT}` ||
+            "0.0.0.0:50054",
         },
       },
     ]),
