@@ -3,20 +3,10 @@ syntax = "proto3";
 package history;
 
 service loginHistory {
-  rpc AddLoginHistory(AddLoginHistoryRequest) returns (AddLoginHistoryResponse);
   rpc GetAllLoginHistory(GetAllLoginHistoryRequest) returns (GetAllLoginHistoryResponse);
   rpc GetOneLoginHistory(GetOneLoginHistoryRequest) returns (GetOneLoginHistoryResponse);
 }
 
-
-message AddLoginHistoryRequest {
-  int32 id = 1;
-  string name = 2;
-  string email = 3;
-  string role = 4;
-}
-
-message AddLoginHistoryResponse {}
 
 message GetAllLoginHistoryRequest {}
 

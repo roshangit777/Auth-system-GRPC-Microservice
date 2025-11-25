@@ -5,7 +5,8 @@ import { AuthModule } from "./auth/auth.module";
 import { PostModule } from "./post/post.module";
 import { FileUploadModule } from "./file-upload/file-upload.module";
 import { JwtModule } from "@nestjs/jwt";
-import { LoginHistoryModule } from './login-history/login-history.module';
+import { LoginHistoryModule } from "./login-history/login-history.module";
+import { NotificationModule } from "./notification/notification.module";
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { LoginHistoryModule } from './login-history/login-history.module';
       global: true,
     }),
     LoginHistoryModule,
+    NotificationModule,
   ],
   controllers: [ApiGatewayController],
   providers: [ApiGatewayService],

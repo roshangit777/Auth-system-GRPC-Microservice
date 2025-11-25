@@ -1,6 +1,6 @@
 import { Controller } from "@nestjs/common";
 import { LoginHistoryModuleService } from "./login-history.module.service";
-import { GrpcMethod, Payload } from "@nestjs/microservices";
+import { GrpcMethod, MessagePattern, Payload } from "@nestjs/microservices";
 import type { UserDetails } from "./interfaces/userDetails.interface";
 
 @Controller()
@@ -9,10 +9,11 @@ export class LoginHistoryModuleController {
     private readonly LoginHistorymoduleService: LoginHistoryModuleService
   ) {}
 
-  @GrpcMethod("loginHistory", "AddLoginHistory")
+  /* @GrpcMethod("loginHistory", "AddLoginHistory") */
+  @MessagePattern("record_login")
   createHistory(@Payload() data: UserDetails) {
+    console.log("login history controller");
     this.LoginHistorymoduleService.recordLogin(data);
-    return { message: "done" };
   }
 
   @GrpcMethod("loginHistory", "GetAllLoginHistory")

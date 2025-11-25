@@ -7,7 +7,6 @@ import { JwtModule } from "@nestjs/jwt";
 /* import { EventsModule } from "src/events/events.module"; */
 import { AppModule } from "./app.module";
 import { ClientsModule, Transport } from "@nestjs/microservices";
-import { join } from "path";
 
 @Module({
   imports: [
@@ -15,12 +14,25 @@ import { join } from "path";
     TypeOrmModule.forFeature([Users]),
     ClientsModule.register([
       {
-        name: "LOGIN_HISTORY_CLIENT",
-        transport: Transport.GRPC,
+        name: "LOGIN_HISTORY_RMQ",
+        transport: Transport.RMQ,
         options: {
-          package: "history",
-          protoPath: join(process.cwd(), "proto/history.proto"),
-          url: "0.0.0.0:50054",
+          urls: ["amqp://guest:guest@localhost:5672"],
+          queue: "login_history_queue",
+          queueOptions: {
+            durable: true,
+          },
+        },
+      },
+      {
+        name: "NOTIFICATION_RECORD_RMQ",
+        transport: Transport.RMQ,
+        options: {
+          urls: ["amqp://guest:guest@localhost:5672"],
+          queue: "notification_record_queue",
+          queueOptions: {
+            durable: true,
+          },
         },
       },
     ]),

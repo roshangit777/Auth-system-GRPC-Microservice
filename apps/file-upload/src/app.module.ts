@@ -10,7 +10,7 @@ import { ThrottlerModule } from "@nestjs/throttler"; */
   imports: [
     TypeOrmModule.forRoot({
       type: "postgres",
-      host: "host.docker.internal",
+      host: "localhost",
       port: 5432,
       username: "postgres", // your pgAdmin username
       password: "root", // your pgAdmin password

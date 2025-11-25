@@ -2,7 +2,7 @@ import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 /* import { EventEmitterModule } from "@nestjs/event-emitter";
 import { ThrottlerModule } from "@nestjs/throttler"; */
-import { LoginHistory } from "./entity/login-history.entity";
+import { Notification } from "./entity/notification.entity";
 
 @Module({
   imports: [
@@ -12,10 +12,10 @@ import { LoginHistory } from "./entity/login-history.entity";
       port: 5432,
       username: "postgres", // your pgAdmin username
       password: "root", // your pgAdmin password
-      database: "nestjs_loginHistory", // the database you created
+      database: "nestjs_notification", // the database you created
       autoLoadEntities: true,
       synchronize: true, // only for development
-      entities: [LoginHistory],
+      entities: [Notification],
     }),
     /*  ConfigModule.forRoot({
       isGlobal: true,

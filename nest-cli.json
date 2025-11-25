@@ -43,6 +43,15 @@
         "tsConfigPath": "apps/login-history/tsconfig.app.json"
       }
     },
+    "notification": {
+      "type": "application",
+      "root": "apps/notification",
+      "entryFile": "main",
+      "sourceRoot": "apps/notification/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/notification/tsconfig.app.json"
+      }
+    },
     "post": {
       "type": "application",
       "root": "apps/post",

@@ -3,6 +3,7 @@ import { ApiGatewayModule } from "./api-gateway.module";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import { GrpcToHttpInterceptor } from "../../common/filters/global.exception";
+import { Transport } from "@nestjs/microservices";
 
 async function bootstrap() {
   const app = await NestFactory.create(ApiGatewayModule);
@@ -18,6 +19,16 @@ async function bootstrap() {
   //Helmet helps protect the app from common web vulnerabilities by setting various HTTP security headers automatically.
   app.use(helmet());
   app.useGlobalInterceptors(new GrpcToHttpInterceptor());
+
+  app.connectMicroservice({
+    transport: Transport.RMQ,
+    options: {
+      urls: ["amqp://guest:guest@localhost:5672"],
+      queue: "notification_queue",
+      queueOptions: { durable: true },
+    },
+  });
+  await app.startAllMicroservices();
   await app.listen(process.env.port ?? 3000);
 }
 bootstrap();

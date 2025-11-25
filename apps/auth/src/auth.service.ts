@@ -1,4 +1,4 @@
-import { Inject, Injectable, OnModuleInit } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { Repository } from "typeorm";
 import { Users, UserRole } from "./entities/user.entity";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -6,26 +6,20 @@ import { RegisterUserDto } from "./dto/register.dto";
 import * as bcrypt from "bcrypt";
 import { LoginUserDto } from "./dto/login.dto";
 import { JwtService } from "@nestjs/jwt";
-import type { ClientGrpc } from "@nestjs/microservices";
+import type { ClientProxy } from "@nestjs/microservices";
 import { RpcException } from "@nestjs/microservices";
 import { status } from "@grpc/grpc-js";
 /* import { LoginHistory } from 'src/events/entity/login-history.entity'; */
 
 @Injectable()
-export class AuthService implements OnModuleInit {
-  private loginHistoryServices: any;
-
+export class AuthService {
   constructor(
     @InjectRepository(Users) private userRepository: Repository<Users>,
     private jwtService: JwtService,
     /* private readonly userEventService: UserEventsService, */
-    @Inject("LOGIN_HISTORY_CLIENT") private loginHistroryClient: ClientGrpc
+    @Inject("LOGIN_HISTORY_RMQ") private loginHistroryClient: ClientProxy,
+    @Inject("NOTIFICATION_RECORD_RMQ") private notificationClient: ClientProxy
   ) {}
-
-  onModuleInit() {
-    this.loginHistoryServices =
-      this.loginHistroryClient.getService("loginHistory");
-  }
 
   async userRegister(userData: RegisterUserDto) {
     const existUser = await this.userRepository.findOne({
@@ -115,7 +109,8 @@ export class AuthService implements OnModuleInit {
       email: user.email,
       role: user.role,
     };
-    this.loginHistoryServices.AddLoginHistory(loginData);
+    this.loginHistroryClient.emit("record_login", loginData);
+    this.notificationClient.emit("record_notification", user.id);
 
     /* this.loginHistroryClient.emit("history.create", user.id).subscribe({
       next: (res) => console.log("Login recorded:", res),
@@ -194,7 +189,8 @@ export class AuthService implements OnModuleInit {
       email: user.email,
       role: user.role,
     };
-    this.loginHistoryServices.AddLoginHistory(loginData);
+    this.loginHistroryClient.emit("record_login", loginData);
+    this.notificationClient.emit("record_notification", user.id);
     return { accessToken, refreshToken };
   }
 

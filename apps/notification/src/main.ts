@@ -1,18 +1,17 @@
 import { NestFactory } from "@nestjs/core";
-import { LoginHistoryModule } from "./login-history.module.module";
+import { NotificationModule } from "./notification.module";
 import { Transport } from "@nestjs/microservices";
 import { join } from "path";
 
 async function bootstrap() {
-  const app = await NestFactory.create(LoginHistoryModule);
+  const app = await NestFactory.create(NotificationModule);
 
-  //For GRPC
   app.connectMicroservice({
     transport: Transport.GRPC,
     options: {
-      package: "history",
-      protoPath: join(process.cwd(), "proto/history.proto"),
-      url: "0.0.0.0:50054",
+      package: "notification",
+      protoPath: join(process.cwd(), "proto/notification.proto"),
+      url: "0.0.0.0:50055",
     },
   });
 
@@ -20,13 +19,14 @@ async function bootstrap() {
     transport: Transport.RMQ,
     options: {
       urls: ["amqp://guest:guest@localhost:5672"],
-      queue: "login_history_queue",
+      queue: "notification_record_queue",
       queueOptions: {
         durable: true,
       },
     },
   });
+
   await app.startAllMicroservices();
-  console.log("Post gRPC microservice running on port 50054");
+  console.log("Notification service is running on 50055 grpc port");
 }
 bootstrap();
