@@ -14,7 +14,7 @@ import {
 } from "@nestjs/microservices";
 import { WebsocketGateway } from "./websocket.gateway";
 import type { NotificationStructure } from "./interface/notificationStructure.interface";
-/* import { AuthGuard } from "apps/common/guards/auth.guard"; */
+import { AuthGuard } from "apps/common/guards/auth.guard";
 
 export enum UserRole {
   USER = "user",
@@ -44,14 +44,7 @@ export class NotificationController implements OnModuleInit {
     });
   }
 
-  @Get("create")
-  createNotification() {
-    console.log("This is from api/gateway/notification/Controller");
-    return this.notificationService.AddNotification({
-      id: 2,
-    });
-  }
-
+  @UseGuards(AuthGuard)
   @Get("get/:id")
   getNotification(@Param("id") id: number) {
     return this.notificationService.GetNotification({
@@ -59,9 +52,9 @@ export class NotificationController implements OnModuleInit {
     });
   }
 
+  @UseGuards(AuthGuard)
   @Put("update/:id")
   updateNotification(@Param("id") id: number) {
-    console.log(id);
     return this.notificationService.UpdateNotification({
       id: Number(id),
     });

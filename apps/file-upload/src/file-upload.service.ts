@@ -1,12 +1,11 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { CloudinaryService } from "./cloudinary/cloudinary-service";
 import { Worker } from "worker_threads";
 import fs from "fs";
 import path, { join } from "path";
-import { RpcException } from "@nestjs/microservices";
-import { RpcFile } from "./interfaces/rpc-file.interface";
+import { ClientProxy, RpcException } from "@nestjs/microservices";
 import { File } from "./entity/cloudinary.entity";
 import { status } from "@grpc/grpc-js";
 
@@ -28,116 +27,9 @@ interface WorkerResponse {
 export class FileUploadService {
   constructor(
     @InjectRepository(File) private readonly fileRepository: Repository<File>,
-    private readonly cloudinaryService: CloudinaryService
+    private readonly cloudinaryService: CloudinaryService,
+    @Inject("NOTIFICATION_RECORD_RMQ") private notificationClient: ClientProxy
   ) {}
-
-  /* async uploadFile(data: {
-    file: RpcFile;
-    description: string | undefined;
-    user: AuthorData;
-  }): Promise<File> {
-    const { file, description, user } = data;
-    let uploadedImagePath: string = "";
-    let compressedImagePath: string = "";
-    const uploadFile: File = await new Promise((resolve, reject) => {
-      const tempDir = path.join(__dirname, "..", "uploads");
-      if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
-
-      const tempPath = path.join(tempDir, `${Date.now()}-${file.originalname}`);
-      uploadedImagePath = tempPath;
-      const realBuffer = Buffer.isBuffer(file.buffer)
-        ? file.buffer
-        : Buffer.from(file.buffer.data);
-      fs.writeFileSync(tempPath, realBuffer);
-
-      const workerPath = join(
-        process.cwd(),
-        "dist",
-        "apps",
-        "workers",
-        "imageCompression.js"
-      );
-
-      const worker = new Worker(workerPath, {
-        workerData: { tempPath },
-      });
-
-      worker.on("message", (data: WorkerResponse) => {
-        compressedImagePath = data.path;
-        this.cloudinaryService
-          .uploadFile(data.path)
-          .then(async (cloudinaryResponse) => {
-            const newlyCreatedFile = this.fileRepository.create({
-              originalName: file.originalname,
-              mimeType: file.mimetype,
-              size: file.size,
-              publicId: cloudinaryResponse?.public_id,
-              url: cloudinaryResponse.secure_url,
-              description,
-              uploader: Number(user?.sub),
-              userDetails: {
-                id: Number(user?.sub),
-                name: user.name,
-                email: user.email,
-                role: user.role,
-              },
-            });
-            const savedFile = await this.fileRepository.save(newlyCreatedFile);
-            resolve(savedFile);
-          })
-          .catch((error) =>
-            reject(
-              new RpcException({
-                code: status.INTERNAL,
-                message: `Error in image compression/ Worker_on,
-            ${error.message}`,
-              })
-            )
-          );
-      });
-
-      worker.on("error", (error): void => {
-        setTimeout(() => {
-          if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath);
-        }, 500);
-        reject(
-          new RpcException({
-            code: status.INTERNAL,
-            message: `Error in image compression,
-            ${error.message}`,
-          })
-        );
-      });
-
-      worker.on("exit", (code) => {
-        if (code !== 0) {
-          reject(
-            new RpcException({
-              code: status.INTERNAL,
-              message: `Worker stopped with exit code ${code}`,
-            })
-          );
-        }
-      });
-    });
-
-    if (!uploadFile) {
-      throw new RpcException({
-        code: status.INTERNAL,
-        message: "Failed to upload file",
-      });
-    }
-
-    //cleanups
-    try {
-      await fs.promises.rm(uploadedImagePath, { force: true });
-      await fs.promises.rm(compressedImagePath, { force: true });
-    } catch (err) {
-      console.warn("Cleanup failed:", err);
-    }
-
-    return uploadFile;
-  } */
 
   async uploadFile(data): Promise<File> {
     const { file, description, user } = data;
@@ -262,7 +154,12 @@ export class FileUploadService {
           );
         }
       });
-
+      this.notificationClient.emit("record_notification", {
+        userId: Number(user.sub),
+        type: "success",
+        title: "Successfully File Uploaded",
+        message: `The file with title "${result.originalName}" has been uploaded.`,
+      });
       return result;
     } finally {
       if (uploadedImagePath) fs.promises.rm(uploadedImagePath, { force: true });

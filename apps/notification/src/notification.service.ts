@@ -28,7 +28,7 @@ export class NotificationService {
       type: data.type,
     });
     await this.notificationRepository.save(result);
-    this.notificationClient.emit("broadcast_notification", { result });
+    this.notificationClient.emit("broadcast_notification", { ...result });
   }
 
   async userNotification(id: number) {

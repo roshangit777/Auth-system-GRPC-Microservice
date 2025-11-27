@@ -7,6 +7,7 @@ import { MulterModule } from "@nestjs/platform-express";
 import { memoryStorage } from "multer";
 import { AppModule } from "./app.module";
 import { File } from "./entity/cloudinary.entity";
+import { ClientsModule, Transport } from "@nestjs/microservices";
 
 @Module({
   imports: [
@@ -14,6 +15,19 @@ import { File } from "./entity/cloudinary.entity";
     TypeOrmModule.forFeature([File]),
     CloudinaryModule,
     MulterModule.register({ storage: memoryStorage() }),
+    ClientsModule.register([
+      {
+        name: "NOTIFICATION_RECORD_RMQ",
+        transport: Transport.RMQ,
+        options: {
+          urls: ["amqp://guest:guest@localhost:5672"],
+          queue: "notification_record_queue",
+          queueOptions: {
+            durable: true,
+          },
+        },
+      },
+    ]),
   ],
   controllers: [FileUploadController],
   providers: [FileUploadService],

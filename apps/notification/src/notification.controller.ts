@@ -16,7 +16,6 @@ export class NotificationController {
 
   @MessagePattern("record_notification")
   async saveNotification(@Payload() data: NotificationStructure) {
-    console.log("This is from notification/Controller");
     await this.notificationService.saveUserNotifications(data);
   }
 

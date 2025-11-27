@@ -12,7 +12,6 @@ export class LoginHistoryModuleController {
   /* @GrpcMethod("loginHistory", "AddLoginHistory") */
   @MessagePattern("record_login")
   createHistory(@Payload() data: UserDetails) {
-    console.log("login history controller");
     this.LoginHistorymoduleService.recordLogin(data);
   }
 
