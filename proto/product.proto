@@ -1,0 +1,99 @@
+syntax = "proto3";
+
+package product;
+
+service productService {
+    rpc GetAllProduct (GetAllProductRequest) returns (GetAllProductResponse);
+    rpc CreateOrder (CreateOrderRequest) returns (CreateOrderResponse);
+}
+
+message UploaderDetails {
+  int32 id = 1;                
+  string name = 2;
+  string email = 3;
+  string role = 4;          
+}
+
+message FileResponse {
+  string id = 1;
+  string originalName = 2;
+  string mimeType = 3;
+  string size = 4;
+  string url = 5;
+  string publicId = 6;
+  int32 price = 7;
+  string description = 8;
+  string uploader = 9;
+  UploaderDetails userDetails = 10;
+  string createdAt = 11;
+}
+
+message GetAllProductRequest {}
+
+message GetAllProductResponse {
+    repeated FileResponse files = 1;
+}
+
+message CreateOrderRequest {
+    int32 amount = 1;
+    string currency = 2;
+    string userId = 3;
+    string productId = 4;
+    string customerEmail = 5;
+    string customerName = 6;
+    string customerNumber = 7;
+}
+
+/* message CreateOrderResponse {
+  string id = 1;                 // UUID (internal order id)
+  string userId = 2;             // User who purchased
+  string name = 3;
+  string email = 4;
+  string fileId = 5;             // File/product reference
+  string razorpayOrderId = 6;    // Razorpay order ID (order_xxxxxxx)
+  double price = 7;              // 299, 500 etc.
+  string currency = 8;           // INR, USD etc.
+  string entity = 9;             // always "order" from Razorpay
+  string receipt = 10;           // custom receipt from Razorpay
+  bool paid = 11;                // Whether payment completed or not
+  string createdAt = 12; 
+} */
+
+message CustomerDetails {
+  string name = 1;
+  string contact = 2;
+  string email = 3;
+}
+
+message NotifyInfo {
+  bool email=1;
+  bool sms=2;
+  bool whatsapp=3;
+}
+
+message CreateOrderResponse {
+bool acceptPartial = 1;
+  int32 amount = 2;
+  int32 amountPaid = 3;
+  int32 cancelledAt = 4;
+  int32 createdAt = 5;
+  string currency = 6;
+  CustomerDetails customer = 7;
+  string description = 8;
+  int32 expireBy = 9;
+  int32 expiredAt = 10;
+  int32 firstMinPartialAmount=11;
+  string id=12;
+  string notes=13;
+  NotifyInfo notify=14;
+  string payments=15;
+  string referenceId=16;
+  bool reminderEnable=17;
+  repeated string reminders=18;
+  string shortUrl=19;
+  string status=20;
+  int32 updatedAt=21;
+  string upiLink=22;
+  bool userId=23;
+  bool whatsappLink=24;
+}

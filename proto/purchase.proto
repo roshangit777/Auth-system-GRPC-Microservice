@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package purchase;
+
+service PurchaseService {
+    rpc GetAllOrders (GetAllOrdersRequest) returns (GetAllOrdersResponse);
+    rpc GetAllSuccessfullOrders (GetAllSuccessfullOrdersRequest) returns (GetAllSuccessfullOrdersResponse);
+    rpc GetAllUsersPurchase (GetAllUsersPurchaseRequest) returns (GetAllUsersPurchaseResponse);
+}
+
+message GetAllOrdersRequest {}
+
+message Order {
+  string id = 1;              
+  int32 userId = 2;           
+  string name = 3;
+  string email = 4;
+  string fileId = 5;
+  string orderId = 6;
+  string price = 7;
+  string currency = 8;
+  string entity = 9;
+  string receipt = 10;
+  bool paid = 11;
+  string createdAt = 12; 
+}
+
+message GetAllOrdersResponse {
+  repeated Order orders = 1;
+}
+
+message GetAllSuccessfullOrdersRequest {}
+
+message GetAllSuccessfullOrdersResponse {
+    repeated Order orders = 1;
+}
+
+message GetAllUsersPurchaseRequest {
+    string id = 1;
+}
+
+message UploaderDetails {
+  int32 id = 1;                
+  string name = 2;
+  string email = 3;
+  string role = 4;          
+}
+
+message FileResponse {
+  string id = 1;
+  string originalName = 2;
+  string mimeType = 3;
+  string size = 4;
+  string url = 5;
+  int32 price = 7;
+  UploaderDetails userDetails = 10;
+  string createdAt = 11;
+}
+
+message GetAllUsersPurchaseResponse {
+  repeated FileResponse files = 1;
+}
+

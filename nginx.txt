@@ -1,0 +1,39 @@
+1) Installing NGINX
+
+Method 1: 
+
+1) Open ternminal and run command: docker run -it -p 8080:80 ubuntu
+        -> it creates a linux machine
+2) and now ur inside linux now run this command: apt-get update
+        -> now it will update the linux packages
+3) Now run this command to install NGINX: apt-get install nginx
+4) Now you have installed the NGINX, check it using nginx -v cmd
+5) now go to browser and open localhost:8080 it will not run but come back to terminal and run: nginx      now go back to browser it will start running
+6) Now inside the docker/virtualization where the linux is running, go there and run this cmd: ls etc/nginx
+        -> it will show all the nginx files and look for nginx.conf file this is our main file
+7) Install vim in the docker using this command: apt-get install vim
+8) And go to the nginx directory cmd: cd etc/nginx and u will get in the nginx directory now run this command to open nginx.conf in vim: vim nginx.conf
+
+code: 
+
+events {}
+
+http {
+    gzip on;
+    limit_req_zone $binary_remote_addr zone=api_limit:10m rate=10r/s;
+    proxy_cache_path /tmp/nginx keys_zone=mycache:10m inactive=30m;
+
+    upstream api_gateway {
+        server api-gateway-1:3000;
+        server api-gateway-2:3000;
+    }
+
+    server {
+        listen 80;
+        location / {
+            limit_req zone=api_limit;
+            proxy_cache mycache;
+            proxy_pass http://api_gateway;
+        }
+    }
+}

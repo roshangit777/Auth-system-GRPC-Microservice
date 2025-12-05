@@ -37,7 +37,7 @@ export class FileUploadController implements OnModuleInit {
 
   onModuleInit() {
     this.fileUplaodServices =
-      this.fileUploadClient.getService("fileUploadService");
+      this.fileUploadClient.getService("FileUploadService");
   }
 
   @Post()
@@ -63,6 +63,7 @@ export class FileUploadController implements OnModuleInit {
 
   @Get("get-files")
   getFile() {
+    console.log(this.fileUplaodServices);
     return this.fileUplaodServices.GetAllFile({});
   }
 

@@ -52,6 +52,15 @@
         "tsConfigPath": "apps/notification/tsconfig.app.json"
       }
     },
+    "payment": {
+      "type": "application",
+      "root": "apps/payment",
+      "entryFile": "main",
+      "sourceRoot": "apps/payment/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/payment/tsconfig.app.json"
+      }
+    },
     "post": {
       "type": "application",
       "root": "apps/post",
@@ -59,6 +68,24 @@
       "sourceRoot": "apps/post/src",
       "compilerOptions": {
         "tsConfigPath": "apps/post/tsconfig.app.json"
+      }
+    },
+    "product": {
+      "type": "application",
+      "root": "apps/product",
+      "entryFile": "main",
+      "sourceRoot": "apps/product/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/product/tsconfig.app.json"
+      }
+    },
+    "purchase": {
+      "type": "application",
+      "root": "apps/purchase",
+      "entryFile": "main",
+      "sourceRoot": "apps/purchase/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/purchase/tsconfig.app.json"
       }
     }
   }

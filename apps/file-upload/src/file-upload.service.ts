@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { CloudinaryService } from "./cloudinary/cloudinary-service";
 import { Worker } from "worker_threads";
 import fs from "fs";
@@ -188,5 +188,24 @@ export class FileUploadService {
     await this.fileRepository.remove(fileToBeDeleted);
 
     return { message: "File delted successfully" };
+  }
+
+  async getPurchasedFiles(data: string[]) {
+    const result = await this.fileRepository.find({
+      select: [
+        "id",
+        "originalName",
+        "mimeType",
+        "size",
+        "url",
+        "price",
+        "userDetails",
+        "createdAt",
+      ],
+      where: {
+        id: In(data),
+      },
+    });
+    return result;
   }
 }

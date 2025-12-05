@@ -7,6 +7,9 @@ import { FileUploadModule } from "./file-upload/file-upload.module";
 import { JwtModule } from "@nestjs/jwt";
 import { LoginHistoryModule } from "./login-history/login-history.module";
 import { NotificationModule } from "./notification/notification.module";
+import { ProductModule } from './product/product.module';
+import { PaymentModule } from './payment/payment.module';
+import { PurchaseModule } from './purchase/purchase.module';
 
 @Module({
   imports: [
@@ -18,6 +21,9 @@ import { NotificationModule } from "./notification/notification.module";
     }),
     LoginHistoryModule,
     NotificationModule,
+    ProductModule,
+    PaymentModule,
+    PurchaseModule,
   ],
   controllers: [ApiGatewayController],
   providers: [ApiGatewayService],

@@ -20,7 +20,7 @@ interface FileData {
 export class FileUploadController {
   constructor(private readonly fileUploadService: FileUploadService) {}
 
-  @GrpcMethod("fileUploadService", "UploadFile")
+  @GrpcMethod("FileUploadService", "UploadFile")
   async uploadFile(@Payload() data: FileData): Promise<any> {
     return this.fileUploadService.uploadFile({
       file: data.file,
@@ -29,14 +29,21 @@ export class FileUploadController {
     });
   }
 
-  @GrpcMethod("fileUploadService", "GetAllFile")
+  @GrpcMethod("FileUploadService", "GetAllFile")
   async getFile() {
+    console.log("3 from file-uplaod");
     const result = await this.fileUploadService.findAll();
     return { files: result };
   }
 
-  @GrpcMethod("fileUploadService", "DeleteFile")
+  @GrpcMethod("FileUploadService", "DeleteFile")
   async deleteFile(@Payload() data: any): Promise<{ message: string }> {
     return await this.fileUploadService.remove({ id: data.id });
+  }
+
+  @GrpcMethod("FileUploadService", "GetPurchasedFiles")
+  async handleGetPurchasedFiles(@Payload() data: { ids: string[] }) {
+    const result = await this.fileUploadService.getPurchasedFiles(data.ids);
+    return { files: result };
   }
 }

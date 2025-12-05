@@ -25,6 +25,8 @@ export class File {
   uploader: number;
   @Column({ type: "jsonb", nullable: true })
   userDetails: { id: number; name: string; email: string; role: string };
+  @Column({ type: "float", default: 199 })
+  price: number;
   @CreateDateColumn()
   createdAt: Date;
 }

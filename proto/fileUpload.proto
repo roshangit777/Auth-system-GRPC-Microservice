@@ -2,10 +2,11 @@ syntax = "proto3";
 
 package fileUpload;
 
-service fileUploadService {
+service FileUploadService {
   rpc UploadFile (UploadFileRequest) returns (UploadFileResponse);
   rpc GetAllFile (GetAllFileRequest) returns (GetAllFileResponse);
   rpc DeleteFile (DeleteRequest) returns (DeleteResponse);
+  rpc GetPurchasedFiles (GetPurchasedFilesRequest) returns (GetPurchasedFilesResponse);
 }
 
 message FileData {
@@ -46,10 +47,11 @@ message UploadFileResponse {
   string size = 4;
   string url = 5;
   string publicId = 6;
-  string description = 7;
-  string uploader = 8;
-  UploaderDetails userDetails = 9;
-  string createdAt = 10;
+  int32 price = 7;
+  string description = 8;
+  string uploader = 9;
+  UploaderDetails userDetails = 10;
+  string createdAt = 11;
 }
 
 message GetAllFileRequest {}
@@ -64,4 +66,23 @@ message DeleteRequest {
 
 message DeleteResponse {
   string message = 1;
+}
+
+message GetPurchasedFilesRequest {
+  repeated string ids = 1;
+}
+
+message PurchasedFile {
+  string id = 1;
+  string originalName = 2;
+  string mimeType = 3;
+  string size = 4;
+  string url = 5;
+  int32 price = 7;
+  UploaderDetails userDetails = 10;
+  string createdAt = 11;
+}
+
+message GetPurchasedFilesResponse {
+  repeated PurchasedFile files = 1;
 }

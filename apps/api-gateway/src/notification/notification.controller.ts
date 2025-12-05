@@ -5,6 +5,7 @@ import {
   OnModuleInit,
   Param,
   Put,
+  Query,
   UseGuards,
 } from "@nestjs/common";
 import {
@@ -53,8 +54,8 @@ export class NotificationController implements OnModuleInit {
   }
 
   @UseGuards(AuthGuard)
-  @Put("update/:id")
-  updateNotification(@Param("id") id: number) {
+  @Put("update")
+  updateNotification(@Query("id") id: number) {
     return this.notificationService.UpdateNotification({
       id: Number(id),
     });
